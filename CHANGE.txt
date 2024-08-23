@@ -1,0 +1,39 @@
+2023.05.05 by 余荫铠&黎智轩
+-------------------------------------------------------------------
+blockc.f90		添加了新变量 Complex(Kind=8), save :: phase 记录weight的相位
+		正格矢、倒格矢改成了正方格子
+		Norb=1 去掉了子晶格自由度
+		nspin=2 加上了自旋自由度
+		Ndim=Norb*LQ*nspin 加上了自旋自由度
+		Nfam=4 配位数是4，其实不需要用到
+		顺带一提，在 paramC_sets 中取 N_SUN=1
+blockc_obs.f90	添加了新变量 real (kind=8), save :: phaseTot 表示<sign>
+		添加了新变量 Integer, save :: Ncount 用来计phase数了多少次
+		添加了新变量 real (kind=8), save :: ferromagnetism 表示磁化强度
+inconfc.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+outconfc.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+mmuur.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+mmuurm1.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+mmuul.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+mmuulm1.f90	辅助场NSIGL_U(I,NT)的I的范围改成了LQ，而非Ndim
+sli.f90		L_bonds改成了正方格子的键连形式，其实也没用到
+		添加了新函数 NPBC_SPIN(NR) 便于表示hopping中的自旋翻转，其实没用上
+		添加了新函数 NPBC_RX(NR)、NPBC_RY(NR)，便于在周期格子中计算距离，其实也没用上
+npbc.f90		同上
+seth.f90		改成了沿x或y方向非最近邻的跃迁，且伴随自旋翻转
+sethproj.f90	修改了相应的无序初态（Itwist=1）
+		添加了铁磁初态（Itwist=0）
+SuNF.f90		在每次计算CALL INV (ULR,ULRINV,DET1)的后面都计算了phase=det1(1)/abs(det1(1))
+		如果LTROT==0，那么直接计算初态的观测量，以及phasetot
+upgradeU.f90	用2*2的行列式来计算RATIOUP，其中DEL44和DEL55是一样的，因为对于同一个位置的up和down来说辅助场是相同的
+		其余的矩阵运算基本与 chiral Ising 程序的写法一致
+		RATIOTOT =DGAML* RATIOUP*DETA_U这样不知道对不对
+		RATIOTOT的模用来计算蒙卡更新概率
+		RATIOTOT的相位用来更新phase
+		每次更新辅助场都算一下phasetot=phasetot+real(phase)，这样计算<sign>的样本数会比较大
+obser.f90		这里，GRUPC不再表示Green function的up-up分块，而是整个Green function
+		定义观测量时都乘上了相位phase
+		定义了密度density
+		定义了磁化强度ferromagnetism
+		定义了自旋关联spin(imj,1,1)，其中用到Wick theorem的完整形式，包含up-down这种关联
+preq.f90		把以上观测量写出来
